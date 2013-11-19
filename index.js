@@ -1,5 +1,4 @@
 return function (tennu) {
-
     try {
         var admins = tennu.config('admins').forEach(function (admin) {
             // Turn properties into RegExp because JSON doesn't have RegExp
@@ -87,16 +86,3 @@ return function (tennu) {
 
     return tennu_module;
 };
-
-/*
-
-* !join #chan
-* !part [#chan] [reason]
-* !quit [reason]
-* !unban #chan
-* !mode flags
-* !cmode [#chan] flags
-* !ban [#chan] hostmask
-* !quiet [#chan] hostmask
-
-*/
