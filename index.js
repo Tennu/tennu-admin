@@ -44,9 +44,10 @@ return function (tennu) {
 
     var requireAdmin = function (fn) {
         return function (command) {
-            if (isAdmin(command.sender)) {
+            if (isAdmin(command.hostmask)) {
                 fn(command);
             } else {
+                tennu.warn("Invalid admin function usage by " + command.hostmask);
                 return "Permission denied.";
             }
         }
