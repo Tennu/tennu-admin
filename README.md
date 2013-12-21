@@ -4,6 +4,10 @@ Gives administrative control to a Tennu bot.
 
 Depends on Tennu 0.6.* or higher.
 
+## Installation
+
+`npm install tennu-admin`
+
 ## Config
 
 These belong on the config object passed to the tennu.Client() function.

@@ -1,0 +1,24 @@
+{
+  "name": "tennu-admin",
+  "version": "0.9.0",
+  "description": "Tennu Admin module.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/Havvy/tennu-admin.git"
+  },
+  "keywords": [
+    "tennu",
+    "irc",
+    "admin",
+    "tennu-module"
+  ],
+  "author": "Ryan (Havvy) Scheel",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/Havvy/tennu-admin/issues"
+  }
+}
