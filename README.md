@@ -1,8 +1,8 @@
 # Admin Module for Tennu
 
-Gives administrative control to a Tennu bot.
+Gives administrative control to a [Tennu](https://github.com/havvy/tennu) bot.
 
-Depends on Tennu 0.6.* or higher.
+Depends on Tennu 0.7.2 or higher.
 
 ## Installation
 
@@ -10,7 +10,7 @@ Depends on Tennu 0.6.* or higher.
 
 ## Config
 
-These belong on the config object passed to the tennu.Client() function.
+This module add a property to the config object passed to `tennu.Client()`.
 
 ### admins property
 
@@ -18,18 +18,40 @@ In the config file, add an 'admins' property which takes a list of objects with 
 
 ```javascript
 {
-    nick: "^name$",
+    nickname: "^name$",
     username: "^name$",
-    hostmask: "^your\.hostmask\.isp\.net$"
-    identified: true,
+    hostname: "^your\.hostmask\.isp\.net$"
+    identifiedas: "accountname",
 }
 ```
 
-The nick, username, and hostmask fields will be turned into regular expressions.
+The nickname, username, and hostname fields will be coverted to case-insensitive regular expressions.
 
-A person is considered an admin of the bot if all properties on one of the admin objects are true.
+A person is considered an admin of the bot if all set properties on one of the admin objects are true.
 
-All properties are optional. You could theoretically give everybody access by doing:  admins: [{}].
+### Example:
+
+**Remember:** Comments are not valid in JSON.
+
+```javascript
+{
+    // other config properties
+    admins: [
+        {nickname: "^havvy$", username: "^havvy$", identifiedas: "havvy"},
+        {identifiedas: "botmaster"}
+    ]
+}
+```
+
+This bot will accept as admins anybody who is havvy!havvy@* and identified to the account 'havvy',
+along with anybody identified to the account 'botmaster'.
+
+**Note:** On networks that have Unrealircd and Anope services, the user will only be identified to
+the account while their nickname is the accountname being checked.
+
+**Note:** With Tennu 0.7.2, if the user is using the same nickname as the checked accountname, and the
+nickname is registered to them, on networks that send a 307 (RPL_WHOISREGNICK) will give true for
+identifiedas. With Tennu 0.8.0, this will be false unless the server does not also send a 330 response.
 
 ## Commands
 
@@ -43,7 +65,7 @@ No message is given on a failed or incorrectly sent command.
 
 ## Exports
 
-If you make an admin module, make sure to include these functions in your exports.
+If you make your own admin module, make sure to include these functions in your exports for easy interopt.
 
 ### isAdmin(hostmask: Hostmask): boolean
 

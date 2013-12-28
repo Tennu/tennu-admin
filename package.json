@@ -1,6 +1,6 @@
 {
   "name": "tennu-admin",
-  "version": "1.0.0pre1",
+  "version": "1.0.0",
   "description": "Tennu Admin module.",
   "main": "index.js",
   "scripts": {

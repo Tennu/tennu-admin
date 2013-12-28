@@ -4,12 +4,23 @@ var Q = require('q');
 var help = require('./help.json');
 var anyRegex = /.*/;
 var names = ['nickname', 'username', 'hostname'];
+var adminKeys = names.concat('identifiedas');
 // Hostmask :: {nickname: String, username: String, hostname: String}
 // Response :: tennu$Response
 // Admin :: {nickname: RegExp, username: RegExp, hostname: RegExp, identifiedas: String?}
 
 function notHasIdentifiedasProperty (admin) {
-    return !admin.hasOwnProperty('identifiedas');
+    return !admin['identifiedas'];
+}
+
+function cloneOnlyAdminKeys (object) {
+    var clone = {};
+
+    adminKeys.forEach(function (key) {
+        clone[key] = object[key];
+    });
+
+    return clone;
 }
 
 module.exports = function (client) {
@@ -20,17 +31,19 @@ module.exports = function (client) {
         client.notice(format("Adding admin: %j", admin));
 
         names.forEach(function (name) {
-            if (admin.hasOwnProperty(name)) {
+            if (admin[name]) {
                 admin[name] = new RegExp(admin[name], 'i');
             } else {
                 admin[name] = anyRegex;
             }
         });
+
+        return admin;
     }
 
     // tennu$Client! -> [Admin] throws Error
     function initalizeAdmins () {
-        var admins = client.config('admins').slice();
+        var admins = client.config('admins');
 
         if (!Array.isArray(admins)) {
             var errormsg = "'admins' property in configuration must be an array";
@@ -38,28 +51,23 @@ module.exports = function (client) {
             throw new Error(errormsg);
         }
 
-        admins.forEach(regexify);
-        return admins;
+        return admins.map(cloneOnlyAdminKeys).map(regexify);
     }
 
     // tennu$Client! -> Hostmask -> Admin -> boolean
     function checkHostmask (hostmask, admin) {
-        client.debug(format("Admin object: %s", inspect(admin)));
+        return names.every(function (name) {
+            var result = admin[name].test(hostmask[name]);
 
-        return names.some(function (name) {
+            client.debug(format("%s: %s, %s (%s)",
+                name, hostmask[name], admin[name], result));
+
             return admin[name].test(hostmask[name]);
         });
     }
 
-    // (!) -> Hostmask -> [Admin] -> [Admin]
-    function validHostmask (hostmask, admins) {
-        return admins.filter(function (admin) {
-            return checkHostmask(hostmask, admin);
-        });
-    }
-
     // Module Initialization
-    initalizeAdmins();
+    admins = initalizeAdmins();
 
     // Hostmask -> Promise boolean
     var isAdmin = function (hostmask) {
@@ -70,25 +78,35 @@ module.exports = function (client) {
                 return checkHostmask(hostmask, admin);
             });
 
+            client.debug("isAdmin info!");
+            client.debug(hostmask_passed);
+
             if (hostmask_passed.some(notHasIdentifiedasProperty)) {
+                client.debug("Some filtered admin doesn't have identifiedas property.")
                 return true;
             }
 
             return (function recur () {
                 if (hostmask_passed.length === 0) {
+                    client.debug("Out of filtered hostmasks.");
                     return false;
                 }
 
                 return Q(hostmask_passed.pop())
                 .get('identifiedas')
                 .then(function (accountname) {
-                    if (isIdentifiedAs(hostmask.nickname, accountname)) {
-                        return true;
-                    } else {
-                        return recur();
-                    }
+                    return isIdentifiedAs(hostmask.nickname, accountname)
+                    .then(function (isIdentifiedAs) {
+                        if (isIdentifiedAs) {
+                            client.debug("nickname is identified as accountname");
+                            return true;  
+                        } else {
+                            client.debug("Recurring");
+                            return recur();
+                        }
+                    });
                 });
-            });
+            }());
         });
     };
 
@@ -102,7 +120,7 @@ module.exports = function (client) {
                 return "Permission denied.";
             }
         }
-    }
+    };
 
     var admin_module = {
         dependencies: ['user'],
@@ -121,15 +139,18 @@ module.exports = function (client) {
             }),
 
             "!part" : requiresAdmin(function (command) {
+                var channel;
+
                 if (command.args[0]) {
-                    client.notice(format("Parting %s - requested by %s", command.args[0], command.prefix));
-                    client.part(command.args[0]);
+                    channel = command.args[0];
                 } else if (!command.isQuery) {
-                    client.notice(format("Parting %s - requested by %s", command.channel, command.prefix));
-                    client.part(command.channel);
+                    channel = command.channel;
                 } else {
                     return this.exports.help.join;
                 }
+
+                client.notice(format("Parting %s - requested by %s", channel, command.prefix));
+                client.part(command.args[0]);
             }),
 
             "!quit" : requiresAdmin(function (command) {
