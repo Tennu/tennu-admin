@@ -1,0 +1,5 @@
+{
+    "join": "Join specifed channel.",
+    "part": "Part specified channel.",
+    "quit": "Quit from network."
+}
