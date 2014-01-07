@@ -1,5 +1,21 @@
 {
-    "join": "Join specifed channel.",
-    "part": "Part specified channel.",
-    "quit": "Quit from network."
+    "join": [
+        "!join <channel>",
+        " ",
+        "Join specifed channel.",
+        "Requires admin privileges."
+    ],
+    "part": [
+        "!part [<channel>]",
+        " ",
+        "Part specified channel.",
+        "If no channel is given, parts channel message was sent in.",
+        "Requires admin privileges."
+    ],
+    "quit": [
+        "!quit [<reason>]",
+        " ",
+        "Quit from network with given reason.",
+        "Requires admin privileges."
+    ]
 }

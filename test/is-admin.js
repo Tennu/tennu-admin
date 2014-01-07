@@ -1,16 +1,17 @@
-var sinon = require('sinon');
-var assert = require('better-assert');
-var equal = require('deep-eql');
-var inspect = require('util').inspect;
-var format = require('util').format;
+const sinon = require('sinon');
+const assert = require('better-assert');
+const equal = require('deep-eql');
+const inspect = require('util').inspect;
+const format = require('util').format;
 
-var admin_module = require('../admin.js');
-var Q = require('q');
-var debug = false;
-var logfn = debug ? console.log.bind(console) : function () {};
+const debug = false;
+const logfn = debug ? console.log.bind(console) : function () {};
 
-var hostmask = function (hm) {
-    var parts = hm.split(/!|@/g);
+const AdminModule = require('../admin.js');
+const Q = require('q');
+
+const hostmask = function (hm) {
+    const parts = hm.split(/!|@/g);
 
     return {
         nickname: parts[0],
@@ -19,13 +20,13 @@ var hostmask = function (hm) {
     };
 };
 
-var joeb = hostmask('joe!brown@a');
-var joeg = hostmask('joe!green@b');
-var annb = hostmask('ann!brown@a');
-var anng = hostmask('ann!green@c');
-var bob = hostmask('bob!locke@z');
+const joeb = hostmask('joe!brown@a');
+const joeg = hostmask('joe!green@b');
+const annb = hostmask('ann!brown@a');
+const anng = hostmask('ann!green@c');
+const bob = hostmask('bob!locke@z');
 
-var isIdentifiedAs = function (nickname, accountame) {
+const isIdentifiedAs = function (nickname, accountame) {
     logfn(format("isIdentifiedAs(%s, %s)", nickname, accountame));
     var result = false;
 
@@ -35,23 +36,22 @@ var isIdentifiedAs = function (nickname, accountame) {
         result = true;
     }
 
-    logfn("Result: " + result);
+    logfn("isIdentifiedAs Result: " + result);
     return Q(result);
 };
 
-// (tennu$client -> tennu-modules$Module)! -> tennu$client -> tennu-modules$Module
-var loadWith = function (tennu) {
-    logfn("Loading Admin module.");
-    var module = admin_module(tennu);
-    module.imports = {};
-    module.imports.isIdentifiedAs = isIdentifiedAs;
-    return module;
+const imports = {
+    user: {
+        isIdentifiedAs: isIdentifiedAs
+    }
 };
 
 describe('is-admin', function () {
     var tennu, isAdmin
 
     beforeEach(function () {
+        logfn(/* newline */);
+
         tennu = {
             debug: logfn,
             info: logfn,
@@ -63,14 +63,17 @@ describe('is-admin', function () {
         tennu.debug();
     });
 
+    it('is of the \'admin\' role', function () {
+        assert(AdminModule.role === 'admin');
+    });
+
     describe('with no admins', function () {
         beforeEach(function () {
             tennu.config = function () {
                 return [];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is false for joeb', function (done) {
@@ -115,8 +118,7 @@ describe('is-admin', function () {
                 return [{}];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is true for joeb', function (done) {
@@ -168,8 +170,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is false for joeb', function (done) {
@@ -223,8 +224,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is true for joeb', function (done) {
@@ -273,8 +273,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is true for joeb', function (done) {
@@ -323,8 +322,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is false for joeb', function (done) {
@@ -373,8 +371,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is true for joeb', function (done) {
@@ -423,8 +420,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is true for joeb', function (done) {
@@ -475,8 +471,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is false for joeb', function (done) {
@@ -525,8 +520,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is false for joeb', function (done) {
@@ -580,8 +574,7 @@ describe('is-admin', function () {
                 ];
             };
 
-            var module = loadWith(tennu);
-            isAdmin = module.exports.isAdmin;
+            isAdmin = AdminModule.init(tennu, imports).exports.isAdmin;
         });
 
         it('is true for joeb', function (done) {
