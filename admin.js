@@ -160,7 +160,7 @@ AdminModule = {
             },
 
             help: help,
-            commmands: ['join', 'part', 'quit']
+            commands: ['join', 'part', 'quit']
         };
 
         return admin_module;
