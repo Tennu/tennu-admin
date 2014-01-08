@@ -162,8 +162,6 @@ AdminModule = {
             help: help,
             commands: ['join', 'part', 'quit']
         };
-
-        return admin_module;
     },
     name: 'admin',
     role: 'admin',
