@@ -1,5 +1,7 @@
 # Admin Module for Tennu
 
+[![Build Status](https://travis-ci.org/Tennu/tennu-admin.png?branch=master)](https://travis-ci.org/Tennu/tennu-admin)
+
 Gives administrative control to a [Tennu](https://github.com/havvy/tennu) bot.
 
 Depends on Tennu 0.7.2 or higher.

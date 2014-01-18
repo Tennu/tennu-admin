@@ -8,7 +8,7 @@ const debug = false;
 const log = debug ? console.log.bind(console) : function () {};
 
 const AdminModule = require('../admin.js');
-const Q = require('q');
+const Promise = require('bluebird');
 
 const hostmask = function (hm) {
     const parts = hm.split(/!|@/g);
@@ -37,7 +37,7 @@ const isIdentifiedAs = function (nickname, accountame) {
     }
 
     log("isIdentifiedAs Result: " + result);
-    return Q(result);
+    return Promise.resolve(result);
 };
 
 const imports = {
