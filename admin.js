@@ -23,9 +23,7 @@ function cloneOnlyAdminKeys (object) {
     return clone;
 }
 
-module.exports = 
-
-AdminModule = {
+module.exports = AdminModule = {
     init: function (client, imports) {
         const isIdentifiedAs = imports.user.isIdentifiedAs;
 
@@ -76,7 +74,8 @@ AdminModule = {
 
         // Hostmask -> Promise boolean
         const isAdmin = function (hostmask) {
-            return Q(admins).then(function (admins) {
+            return Q(admins)
+            .then(function (admins) {
                 const hostmask_passed = admins.filter(function (admin) {
                     return checkHostmask(hostmask, admin);
                 });
@@ -114,13 +113,15 @@ AdminModule = {
         // (Command -> Response) -> (Command -> Response)
         const requiresAdmin = function (fn) {
             return function (command) {
-                if (isAdmin(command.hostmask)) {
-                    return fn(command);
-                } else {
-                    client.warn('Invalid admin function usage by ' + command.prefix);
-                    return 'Permission denied.';
-                }
-            }
+                return isAdmin(command.hostmask)
+                .then(function (isAdmin) {
+                    if (isAdmin) {
+                        return fn(command);
+                    } else {
+                        return 'Permission denied.';
+                    }
+                });
+            };
         };
 
         return {
@@ -132,14 +133,14 @@ AdminModule = {
             handlers: {
                 '!join' : requiresAdmin(function (command) {
                     if (command.args[0]) {
-                        client.notice(format('Joining %s - requested by %s', command.channel, command.prefix));
+                        client.notice(format('PluginAdmin', 'Joining %s - requested by %s', command.channel, command.prefix));
                         client.join(command.args.join(' '));
                     }
 
                 }),
 
                 '!part' : requiresAdmin(function (command) {
-                    const channel;
+                    var channel;
 
                     if (command.args[0]) {
                         channel = command.args[0];
@@ -149,12 +150,12 @@ AdminModule = {
                         return;
                     }
 
-                    client.notice(format('Parting %s - requested by %s', channel, command.prefix));
-                    client.part(command.args[0]);
+                    client.notice(format('PluginAdmin', 'Parting %s - requested by %s', channel, command.prefix));
+                    client.part(channel);
                 }),
 
                 '!quit' : requiresAdmin(function (command) {
-                    client.notice(format('Quitting network - requested by %s', command.prefix));
+                    client.notice(format('PluginAdmin', 'Quitting network - requested by %s', command.prefix));
                     client.quit();
                 })
             },

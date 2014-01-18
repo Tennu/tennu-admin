@@ -5,7 +5,7 @@ const inspect = require('util').inspect;
 const format = require('util').format;
 
 const debug = false;
-const logfn = debug ? console.log.bind(console) : function () {};
+const log = debug ? console.log.bind(console) : function () {};
 
 const AdminModule = require('../admin.js');
 const Q = require('q');
@@ -27,7 +27,7 @@ const anng = hostmask('ann!green@c');
 const bob = hostmask('bob!locke@z');
 
 const isIdentifiedAs = function (nickname, accountame) {
-    logfn(format("isIdentifiedAs(%s, %s)", nickname, accountame));
+    log(format("isIdentifiedAs(%s, %s)", nickname, accountame));
     var result = false;
 
     if (nickname === 'bob' && accountame === 'boblocke') {
@@ -36,7 +36,7 @@ const isIdentifiedAs = function (nickname, accountame) {
         result = true;
     }
 
-    logfn("isIdentifiedAs Result: " + result);
+    log("isIdentifiedAs Result: " + result);
     return Q(result);
 };
 
@@ -50,14 +50,14 @@ describe('is-admin', function () {
     var tennu, isAdmin
 
     beforeEach(function () {
-        logfn(/* newline */);
+        log(/* newline */);
 
         tennu = {
-            debug: logfn,
-            info: logfn,
-            notice: logfn,
-            warn: logfn,
-            error: logfn
+            debug: log,
+            info: log,
+            notice: log,
+            warn: log,
+            error: log
         };
 
         tennu.debug();
