@@ -1,6 +1,6 @@
 const format = require('util').format;
 const inspect = require('util').inspect;
-const Q = require('q');
+const Promise = require('bluebird');
 const help = require('./help.json');
 const anyRegex = /.*/;
 const names = ['nickname', 'username', 'hostname'];
@@ -26,12 +26,11 @@ function cloneOnlyAdminKeys (object) {
 module.exports = AdminModule = {
     init: function (client, imports) {
         const isIdentifiedAs = imports.user.isIdentifiedAs;
-
         var admins;
 
         // tennu.Client! -> {nickname: String?, username: String?, hostname: String?, identifiedas: String?} -> Admin
         function regexify (admin) {
-            client.notice(format('Adding admin: %j', admin));
+            client.notice('PluginAdmin', format('Adding admin: %j', admin));
 
             names.forEach(function (name) {
                 if (admin[name]) {
@@ -62,7 +61,7 @@ module.exports = AdminModule = {
             return names.every(function (name) {
                 const result = admin[name].test(hostmask[name]);
 
-                client.debug(format('%s: %s, %s (%s)',
+                client.debug('PluginAdmin', format('%s: %s, %s (%s)',
                     name, hostmask[name], admin[name], result));
 
                 return admin[name].test(hostmask[name]);
@@ -74,14 +73,10 @@ module.exports = AdminModule = {
 
         // Hostmask -> Promise boolean
         const isAdmin = function (hostmask) {
-            return Q(admins)
-            .then(function (admins) {
+            return Promise.try(function () {
                 const hostmask_passed = admins.filter(function (admin) {
                     return checkHostmask(hostmask, admin);
                 });
-
-                client.debug('isAdmin info!');
-                client.debug(hostmask_passed);
 
                 if (hostmask_passed.some(notHasIdentifiedasProperty)) {
                     return true;
@@ -92,19 +87,19 @@ module.exports = AdminModule = {
                         return false;
                     }
 
-                    return Q(hostmask_passed.pop())
-                    .get('identifiedas')
+                    return Promise.try(function () {
+                        const hostmask = hostmask_passed.pop()
+                        return hostmask.identifiedas;
+                    })
                     .then(function (accountname) {
-                        return isIdentifiedAs(hostmask.nickname, accountname)
-                        .then(function (isIdentifiedAs) {
-                            if (isIdentifiedAs) {
-                                client.debug('nickname is identified as accountname');
-                                return true;  
-                            } else {
-                                client.debug('Recurring');
-                                return recur();
-                            }
-                        });
+                        return isIdentifiedAs(hostmask.nickname, accountname);
+                    })
+                    .then(function (isIdentifiedAs) {
+                        if (isIdentifiedAs) {
+                            return true;
+                        } else {
+                            return recur();
+                        }
                     });
                 }());
             });
