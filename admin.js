@@ -1,7 +1,6 @@
 const format = require('util').format;
 const inspect = require('util').inspect;
 const Promise = require('bluebird');
-const help = require('./help.json');
 const anyRegex = /.*/;
 const names = ['nickname', 'username', 'hostname'];
 const adminKeys = names.concat('identifiedas');
@@ -123,40 +122,7 @@ module.exports = AdminModule = {
             exports: {
                 isAdmin: isAdmin,
                 requiresAdmin: requiresAdmin
-            },
-
-            handlers: {
-                '!join' : requiresAdmin(function (command) {
-                    if (command.args[0]) {
-                        client.notice(format('PluginAdmin', 'Joining %s - requested by %s', command.channel, command.prefix));
-                        client.join(command.args.join(' '));
-                    }
-
-                }),
-
-                '!part' : requiresAdmin(function (command) {
-                    var channel;
-
-                    if (command.args[0]) {
-                        channel = command.args[0];
-                    } else if (!command.isQuery) {
-                        channel = command.channel;
-                    } else {
-                        return;
-                    }
-
-                    client.notice(format('PluginAdmin', 'Parting %s - requested by %s', channel, command.prefix));
-                    client.part(channel);
-                }),
-
-                '!quit' : requiresAdmin(function (command) {
-                    client.notice(format('PluginAdmin', 'Quitting network - requested by %s', command.prefix));
-                    client.quit();
-                })
-            },
-
-            help: help,
-            commands: ['join', 'part', 'quit']
+            }
         };
     },
     name: 'admin',

@@ -1,10 +1,12 @@
-# Admin Module for Tennu
+# Admin Plugin for Tennu
 
 [![Build Status](https://travis-ci.org/Tennu/tennu-admin.png?branch=master)](https://travis-ci.org/Tennu/tennu-admin)
 
-Gives administrative control to a [Tennu](https://github.com/havvy/tennu) bot.
+Gives administrative control to a [Tennu](https://github.com/Tennu/tennu) bot.
 
 Depends on Tennu 0.7.2 or higher.
+
+This plugin implements the 'admin' role.
 
 ## Installation
 
@@ -53,21 +55,11 @@ the account while their nickname is the accountname being checked.
 
 **Note:** With Tennu 0.7.2, if the user is using the same nickname as the checked accountname, and the
 nickname is registered to them, on networks that send a 307 (RPL_WHOISREGNICK) will give true for
-identifiedas. With Tennu 0.8.0, this will be false unless the server does not also send a 330 response.
-
-## Commands
-
-* !join #chan
-* !part [#chan]
-* !quit
-
-Channels default to the channel the command is submitted in.
-
-No message is given on a failed or incorrectly sent command.
+identifiedas. With future versions, this will be false unless the server does not also send a 330 response.
 
 ## Exports
 
-If you make your own admin module, make sure to include these functions in your exports for easy interopt.
+If you make your own plugin with the admin role, make sure to include these functions in your exports for easy interopt.
 
 ### isAdmin(hostmask: Hostmask): boolean
 

@@ -1,6 +1,6 @@
 {
   "name": "tennu-admin",
-  "version": "2.0.2",
+  "version": "3.0.0",
   "description": "Tennu Admin module.",
   "homepage": "https://tennu.github.io/modules/admin",
   "main": "admin.js",
@@ -18,7 +18,7 @@
     "tennu-module"
   ],
   "author": "Ryan (Havvy) Scheel",
-  "license": "BSD-2-Clause",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/Havvy/tennu-admin/issues"
   },
