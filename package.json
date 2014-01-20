@@ -1,9 +1,9 @@
 {
   "name": "tennu-admin",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Tennu Admin module.",
-  "homepage": "https://tennu.github.io/modules/admin",
-  "main": "admin.js",
+  "homepage": "https://tennu.github.io/plugins/admin",
+  "main": "plugin.js",
   "scripts": {
     "test": "mocha -R spec"
   },

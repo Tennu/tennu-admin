@@ -78,11 +78,15 @@ module.exports = AdminModule = {
                 });
 
                 if (hostmask_passed.some(notHasIdentifiedasProperty)) {
+                    client.debug('PluginAdmin', 'Admin object w/o identifiedas property (true)');
                     return true;
                 }
 
+                client.debug('PluginAdmin', 'Admin object w/o identifiedas property (false)');
+
                 return (function recur () {
                     if (hostmask_passed.length === 0) {
+                        client.debug('PluginAdmin', 'User passes an identifiedas check (false)');
                         return false;
                     }
 
@@ -95,6 +99,7 @@ module.exports = AdminModule = {
                     })
                     .then(function (isIdentifiedAs) {
                         if (isIdentifiedAs) {
+                            client.debug('PluginAdmin', 'User passes an identifiedas check (true)');
                             return true;
                         } else {
                             return recur();

@@ -6,7 +6,7 @@ const format = require('util').format;
 const debug = false;
 const log = debug ? console.log.bind(console) : function () {
     };
-const AdminModule = require('../admin.js');
+const AdminPlugin = require('../plugin.js');
 const allowed = 'allowed';
 const alsoAllowed = 'also-allowed';
 const disallowed = 'disallowed';
@@ -57,7 +57,7 @@ const makeCommand = function (nickname) {
 describe('requiresAdmin', function () {
     var instance, requiresAdmin, adminOnlySuccess;
     beforeEach(function () {
-        instance = AdminModule.init(tennu, imports);
+        instance = AdminPlugin.init(tennu, imports);
         requiresAdmin = instance.exports.requiresAdmin;
         adminOnlySuccess = requiresAdmin(replySuccess);
     });
@@ -74,6 +74,14 @@ describe('requiresAdmin', function () {
     });
     it('allows admins (w/o isIdentifiedAs check)', function (done) {
         const command = makeCommand(alsoAllowed);
+        adminOnlySuccess(command).then(function (retval) {
+            assert(retval === 'Success');
+        }).catch(function (err) {
+            return err;
+        }).then(done).done();
+    });
+    it('allows admins (w/ isIdentifiedAs check)', function (done) {
+        const command = makeCommand(allowed);
         adminOnlySuccess(command).then(function (retval) {
             assert(retval === 'Success');
         }).catch(function (err) {

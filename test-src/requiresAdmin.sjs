@@ -7,7 +7,7 @@ const format = require('util').format;
 const debug = false;
 const log = debug ? console.log.bind(console) : function () {};
 
-const AdminModule = require('../admin.js');
+const AdminPlugin = require('../plugin.js');
 
 const allowed = 'allowed';
 const alsoAllowed = 'also-allowed';
@@ -63,7 +63,7 @@ describe 'requiresAdmin' {
     var instance, requiresAdmin, adminOnlySuccess;
 
     beforeEach {
-        instance = AdminModule.init(tennu, imports);
+        instance = AdminPlugin.init(tennu, imports);
         requiresAdmin = instance.exports.requiresAdmin;
         adminOnlySuccess = requiresAdmin(replySuccess);
     }
