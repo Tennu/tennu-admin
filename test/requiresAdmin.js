@@ -29,7 +29,7 @@ const tennu = {
         },
         debug: log,
         info: log,
-        notice: log,
+        note: log,
         warn: log,
         error: log,
         toString: function () {

@@ -29,7 +29,7 @@ module.exports = AdminModule = {
 
         // tennu.Client! -> {nickname: String?, username: String?, hostname: String?, identifiedas: String?} -> Admin
         function regexify (admin) {
-            client.notice('PluginAdmin', format('Adding admin: %j', admin));
+            client.note('PluginAdmin', format('Adding admin: %j', admin));
 
             names.forEach(function (name) {
                 if (admin[name]) {
