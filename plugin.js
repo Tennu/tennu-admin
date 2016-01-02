@@ -28,6 +28,7 @@ module.exports = AdminModule = {
         var admins;
         
         const deniedResponse = (client.config('admin-failed-attempt-response') || 'Permission denied.');
+        const forcedAdminCommands = client.config('admin-commands') || [];
 
         // tennu.Client! -> {nickname: String?, username: String?, hostname: String?, identifiedas: String?} -> Admin
         function regexify (admin) {
@@ -127,23 +128,18 @@ module.exports = AdminModule = {
 
         return {
             commandMiddleware: function(command) {
-                // Is the command defined in the config under 'admin-commands'?
-                var forcedAdminConfigOption = client.config('admin-commands');
-                if (forcedAdminConfigOption) {
-                    if (forcedAdminConfigOption.indexOf(command.command) > -1) {
-                        return Promise.try(function() {
-                            return isAdmin(command.hostmask);
-                        }).then(function(result) {
-                            if (result) {
-                                return command;
-                            }
-                            client._logger.notice(format('tennu-admin: %s tried to run user-defined admin command: %s', command.nickname, command.command));
-                            return deniedResponse;
-                        });
-                    }
+                if (forcedAdminCommands.indexOf(command.command) === -1) {
+                    return command;
                 }
 
-                return command;
+                return isAdmin(command.hostmask)
+                .then(function(isAdmin) {
+                    if (isAdmin) {
+                        return command;
+                    }
+                    client.note("PluginAdmin", format("'%s' tried to run user-defined admin command '%s'", command.nickname, command.command));
+                    return deniedResponse;
+                });
             },            
             exports: {
                 isAdmin: isAdmin,
