@@ -26,6 +26,8 @@ module.exports = AdminModule = {
     init: function (client, imports) {
         const isIdentifiedAs = imports.user.isIdentifiedAs;
         var admins;
+        
+        const deniedResponse = (client.config('admin-failed-attempt-response') || 'Permission denied.');
 
         // tennu.Client! -> {nickname: String?, username: String?, hostname: String?, identifiedas: String?} -> Admin
         function regexify (admin) {
@@ -91,7 +93,7 @@ module.exports = AdminModule = {
                     }
 
                     return Promise.try(function () {
-                        const hostmask = hostmask_passed.pop()
+                        const hostmask = hostmask_passed.pop();
                         return hostmask.identifiedas;
                     })
                     .then(function (accountname) {
@@ -117,13 +119,33 @@ module.exports = AdminModule = {
                     if (isAdmin) {
                         return fn(command);
                     } else {
-                        return 'Permission denied.';
+                        return deniedResponse;
                     }
                 });
             };
         };
 
         return {
+            commandMiddleware: function(command) {
+                console.log('Doing something.....');
+                // Is the command defined in the config under 'admin-commands'?
+                var forcedAdminConfigOption = client.config('admin-commands');
+                if (forcedAdminConfigOption) {
+                    if (forcedAdminConfigOption.indexOf(command.command) > -1) {
+                        return Promise.try(function() {
+                            return isAdmin(command.hostmask);
+                        }).then(function(result) {
+                            if (result) {
+                                return command;
+                            }
+                            client._logger.notice(format('tennu-admin: %s tried to run user-defined admin command: %s', command.nickname, command.command));
+                            return deniedResponse;
+                        });
+                    }
+                }
+
+                return command;
+            },            
             exports: {
                 isAdmin: isAdmin,
                 requiresAdmin: requiresAdmin
