@@ -127,7 +127,6 @@ module.exports = AdminModule = {
 
         return {
             commandMiddleware: function(command) {
-                console.log('Doing something.....');
                 // Is the command defined in the config under 'admin-commands'?
                 var forcedAdminConfigOption = client.config('admin-commands');
                 if (forcedAdminConfigOption) {
