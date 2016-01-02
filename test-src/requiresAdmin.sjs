@@ -29,10 +29,12 @@ const imports = {
 
 const tennu = {
     config: function (value) {
-        return [
-            {'nickname': '^allowed$', 'isIdentifiedAs': 'allowed'},
-            {'nickname': '^also-allowed$'}
-        ];
+        return {
+            admins: [
+                {'nickname': '^allowed$', 'isIdentifiedAs': 'allowed'},
+                {'nickname': '^also-allowed$'}
+            ]
+        }[value];
     },
 
     debug: log,
@@ -77,6 +79,7 @@ describe 'requiresAdmin' {
 
         adminOnlySuccess(command)
         .then(function (retval) {
+            console.log(retval);
             assert(retval === 'Permission denied.')
         })
         .catch(function (err) {
