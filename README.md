@@ -1,12 +1,12 @@
 # Admin Plugin for Tennu
 
-[![Build Status](https://travis-ci.org/Tennu/tennu-admin.png?branch=master)](https://travis-ci.org/Tennu/tennu-admin)
+![Travis Status](https://img.shields.io/travis/Tennu/tennu-admin.svg) ![NPM Downloads](https://img.shields.io/npm/dm/tennu-admin.svg) ![Version](https://img.shields.io/npm/v/tennu-admin.svg) ![ISC Licensed](https://img.shields.io/npm/l/tennu-admin.svg) ![Github Issue Count](https://img.shields.io/github/issues/tennu/tennu-admin.svg) ![Github Stars](https://img.shields.io/github/stars/Tennu/tennu-admin.svg)
 
 Gives administrative control to a [Tennu](https://github.com/Tennu/tennu) bot.
 
-Depends on Tennu 0.7.2 or higher. "admin-commands" configuration option requires tennu 4.7.0
+Depends on Tennu 4.7.0 or higher.
 
-This plugin implements the 'admin' role.
+This plugin implements the 'admin' role. This role is deprecated.
 
 ## Installation
 
@@ -14,15 +14,14 @@ This plugin implements the 'admin' role.
 
 ## Config
 
+- "admins" : The list of admins allowed to use admin commands.
+- "admin-commands" : List of commands that require admin privileges.
 - "admin-failed-attempt-response" : Response returned when access to command is rejected.
-- "admins" : A list of objects to be checked.
-- "admin-commands" : Commands that will be intercepted in flight and checked.
 
-```javascript
-"admin": {
-    "admin-failed-attempt-response": "Permission denied.",
+```json
+{
     "admin-commands": [
-        "choose"
+        "roll"
     ],
     "admins": [
         {
@@ -31,13 +30,21 @@ This plugin implements the 'admin' role.
             hostname: "^your\.hostmask\.isp\.net$"
             identifiedas: "accountname",
         }
-    ]
+    ],
+    "admin-failed-attempt-response": "You aren't allowed to use this command."
 }
 ```
 
-The nickname, username, and hostname fields will be coverted to case-insensitive regular expressions.
+The admin-commands list is a list of commands that you want to only be used by
+admins. Some plugins require the `admin` plugin. For those, the author has
+decided that it is better to always require `admin` control for those commands.
 
-A person is considered an admin of the bot if all set properties on one of the admin objects are true.
+The nickname, username, and hostname fields of admin objects will be coverted
+to case-insensitive regular expressions.
+
+A person is considered an admin of the bot if all set properties on one of the
+admin objects are true. In general, you should just have `identifiedas`
+properties for your admins. Though using just `nickname` on Twitch also works.
 
 ### Example:
 
@@ -51,16 +58,10 @@ A person is considered an admin of the bot if all set properties on one of the a
 This bot will accept as admins anybody who is havvy!havvy@* and identified to the account 'havvy',
 along with anybody identified to the account 'botmaster'.
 
-**Note:** On networks that have Unrealircd and Anope services, the user will only be identified to
-the account while their nickname is the accountname being checked.
-
-**Note:** With Tennu 0.7.2, if the user is using the same nickname as the checked accountname, and the
-nickname is registered to them, on networks that send a 307 (RPL_WHOISREGNICK) will give true for
-identifiedas. With future versions, this will be false unless the server does not also send a 330 response.
+**Note:** On some networks, the user will only be identified to the account while their nickname
+is the accountname being checked.
 
 ## Exports
-
-If you make your own plugin with the admin role, make sure to include these functions in your exports for easy interopt.
 
 ### isAdmin(hostmask: Hostmask): boolean
 
@@ -69,3 +70,5 @@ Determines whether the user is an admin.
 ### requireAdmin(fn: Function): Function
 
 Wraps a function making it require admin priviledges to use.
+
+For example, see [tennu-control](https://github.com/tennu/tennu-control).
