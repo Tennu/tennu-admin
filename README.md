@@ -4,7 +4,7 @@
 
 Gives administrative control to a [Tennu](https://github.com/Tennu/tennu) bot.
 
-Depends on Tennu 0.7.2 or higher.
+Depends on Tennu 0.7.2 or higher. "admin-commands" configuration option requires tennu 4.7.0
 
 This plugin implements the 'admin' role.
 
@@ -14,18 +14,24 @@ This plugin implements the 'admin' role.
 
 ## Config
 
-This module add a property to the config object passed to `tennu.Client()`.
-
-### admins property
-
-In the config file, add an 'admins' property which takes a list of objects with the following format:
+- "admin-failed-attempt-response" : Response returned when access to command is rejected.
+- "admins" : A list of objects to be checked.
+- "admin-commands" : Commands that will be intercepted in flight and checked.
 
 ```javascript
-{
-    nickname: "^name$",
-    username: "^name$",
-    hostname: "^your\.hostmask\.isp\.net$"
-    identifiedas: "accountname",
+"admin": {
+    "admin-failed-attempt-response": "Permission denied.",
+    "admin-commands": [
+        "choose"
+    ],
+    "admins": [
+        {
+            nickname: "^name$",
+            username: "^name$",
+            hostname: "^your\.hostmask\.isp\.net$"
+            identifiedas: "accountname",
+        }
+    ]
 }
 ```
 
@@ -35,16 +41,11 @@ A person is considered an admin of the bot if all set properties on one of the a
 
 ### Example:
 
-**Remember:** Comments are not valid in JSON.
-
 ```javascript
-{
-    // other config properties
-    admins: [
+    "admins": [
         {nickname: "^havvy$", username: "^havvy$", identifiedas: "havvy"},
         {identifiedas: "botmaster"}
     ]
-}
 ```
 
 This bot will accept as admins anybody who is havvy!havvy@* and identified to the account 'havvy',
