@@ -18,17 +18,17 @@ This plugin implements the 'admin' role. This role is deprecated.
 - "admin-commands" : List of commands that require admin privileges.
 - "admin-failed-attempt-response" : Response returned when access to command is rejected.
 
-```json
+```javascript
 {
     "admin-commands": [
         "roll"
     ],
     "admins": [
         {
-            nickname: "^name$",
-            username: "^name$",
-            hostname: "^your\.hostmask\.isp\.net$"
-            identifiedas: "accountname",
+            "nickname": "^name$",
+            "username": "^name$",
+            "hostname": "^your\.hostmask\.isp\.net$",
+            "identifiedas": "accountname"
         }
     ],
     "admin-failed-attempt-response": "You aren't allowed to use this command."
