@@ -1,14 +1,14 @@
-const sinon = require('sinon');
-const assert = require('better-assert');
-const equal = require('deep-eql');
-const inspect = require('util').inspect;
-const format = require('util').format;
+const sinon = require("sinon");
+const assert = require("better-assert");
+const equal = require("deep-eql");
+const inspect = require("util").inspect;
+const format = require("util").format;
 
 const debug = false;
 const log = debug ? console.log.bind(console) : function () {};
 
-const AdminModule = require('../plugin.js');
-const Promise = require('bluebird');
+const AdminModule = require("../plugin.js");
+const Promise = require("bluebird");
 
 const hostmask = function (hm) {
     const parts = hm.split(/!|@/g);
@@ -20,19 +20,19 @@ const hostmask = function (hm) {
     };
 };
 
-const joeb = hostmask('joe!brown@a');
-const joeg = hostmask('joe!green@b');
-const annb = hostmask('ann!brown@a');
-const anng = hostmask('ann!green@c');
-const bob = hostmask('bob!locke@z');
+const joeb = hostmask("joe!brown@a");
+const joeg = hostmask("joe!green@b");
+const annb = hostmask("ann!brown@a");
+const anng = hostmask("ann!green@c");
+const bob = hostmask("bob!locke@z");
 
 const isIdentifiedAs = function (nickname, accountame) {
     log(format("isIdentifiedAs(%s, %s)", nickname, accountame));
     var result = false;
 
-    if (nickname === 'bob' && accountame === 'boblocke') {
+    if (nickname === "bob" && accountame === "boblocke") {
         result = true;
-    } else if (nickname === 'joe' && accountame === 'joebrown') {
+    } else if (nickname === "joe" && accountame === "joebrown") {
         result = true;
     }
 
@@ -46,7 +46,7 @@ const imports = {
     }
 };
 
-describe 'is-admin' {
+describe "is-admin" {
     var tennu, isAdmin
 
     beforeEach {
@@ -63,21 +63,21 @@ describe 'is-admin' {
         tennu.debug();
     }
 
-    it 'is of the \'admin\' role' {
-        assert(AdminModule.role === 'admin');
+    it "is of the \"admin\" role" {
+        assert(AdminModule.role === "admin");
     }
 
     /*
     macro __testname => {
         case { _ ($bool) ($name) } => {
-            return [makeValue('is ' + $bool + ' for ' + $name), #{}];
+            return [makeValue("is " + $bool + " for " + $name), #{}];
         }
     }
     */
 
     macro truefor {
         rule { $name:ident } => {
-            it 'is true for $name' (done) {
+            it "is true for $name" (done) {
                 isAdmin($name)
                 .then(function (isAdmin) {
                     assert(isAdmin);
@@ -90,7 +90,7 @@ describe 'is-admin' {
 
     macro falsefor {
         rule { $name:ident } => {
-            it 'is false for $name' (done) {
+            it "is false for $name" (done) {
                 isAdmin($name)
                 .then(function (isAdmin) {
                     assert(!isAdmin);
@@ -101,7 +101,7 @@ describe 'is-admin' {
         }
     }
 
-    describe 'with no admins' {
+    describe "with no admins" {
         beforeEach {
             tennu.config = function () {
                 return [];
@@ -117,7 +117,7 @@ describe 'is-admin' {
         falsefor bob;
     }
 
-    describe 'with everybody-matches config' {
+    describe "with everybody-matches config" {
         beforeEach {
             tennu.config = function () {
                 return [{}];
@@ -133,7 +133,7 @@ describe 'is-admin' {
         truefor bob;
     }
 
-    describe 'with nobody-matches config' {
+    describe "with nobody-matches config" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -156,7 +156,7 @@ describe 'is-admin' {
         falsefor bob;
     }
 
-    describe 'with nobody-matches and everybody matches config' {
+    describe "with nobody-matches and everybody matches config" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -181,7 +181,7 @@ describe 'is-admin' {
         truefor bob;
     }
 
-    describe 'matching the nick "joe"' {
+    describe "matching the nick 'joe'" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -201,7 +201,7 @@ describe 'is-admin' {
         falsefor bob;
     }
 
-    describe 'matching the username "green"' {
+    describe "matching the username 'green'" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -221,7 +221,7 @@ describe 'is-admin' {
         falsefor bob;
     }
 
-    describe 'matching the usernames "green" and "brown"' {
+    describe "matching the usernames 'green' and 'brown'" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -241,7 +241,7 @@ describe 'is-admin' {
         falsefor bob;
     }
 
-    describe 'matching the hostname "a"' {
+    describe "matching the hostname 'a'" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -261,7 +261,7 @@ describe 'is-admin' {
         falsefor bob;
     }
 
-    describe 'matches bob' {
+    describe "matches bob" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -283,7 +283,7 @@ describe 'is-admin' {
         truefor bob;
     }
 
-    describe 'is identifiedas "boblocke"' {
+    describe "is identifiedas 'boblocke'" {
         beforeEach {
             tennu.config = function () {
                 return [
@@ -303,7 +303,7 @@ describe 'is-admin' {
         truefor bob;
     }
 
-    describe 'is identifiedas "boblocke" or "joebrown"' {
+    describe "is identifiedas 'boblocke' or 'joebrown'" {
         beforeEach {
             tennu.config = function () {
                 return [

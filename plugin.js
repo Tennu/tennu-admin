@@ -1,15 +1,15 @@
-const format = require('util').format;
-const inspect = require('util').inspect;
-const Promise = require('bluebird');
+const format = require("util").format;
+const inspect = require("util").inspect;
+const Promise = require("bluebird");
 const anyRegex = /.*/;
-const names = ['nickname', 'username', 'hostname'];
-const adminKeys = names.concat('identifiedas');
+const names = ["nickname", "username", "hostname"];
+const adminKeys = names.concat("identifiedas");
 // Hostmask :: {nickname: String, username: String, hostname: String}
 // Response :: tennu$Response
 // Admin :: {nickname: RegExp, username: RegExp, hostname: RegExp, identifiedas: String?}
 
 function notHasIdentifiedasProperty (admin) {
-    return !admin['identifiedas'];
+    return !admin["identifiedas"];
 }
 
 function cloneOnlyAdminKeys (object) {
@@ -27,16 +27,16 @@ module.exports = AdminModule = {
         const isIdentifiedAs = imports.user.isIdentifiedAs;
         var admins;
         
-        const deniedResponse = (client.config('admin-failed-attempt-response') || 'Permission denied.');
-        const forcedAdminCommands = client.config('admin-commands') || [];
+        const deniedResponse = (client.config("admin-failed-attempt-response") || "Permission denied.");
+        const forcedAdminCommands = client.config("admin-commands") || [];
 
         // tennu.Client! -> {nickname: String?, username: String?, hostname: String?, identifiedas: String?} -> Admin
         function regexify (admin) {
-            client.note('PluginAdmin', format('Adding admin: %j', admin));
+            client.note("PluginAdmin", format("Adding admin: %j", admin));
 
             names.forEach(function (name) {
                 if (admin[name]) {
-                    admin[name] = new RegExp(admin[name], 'i');
+                    admin[name] = new RegExp(admin[name], "i");
                 } else {
                     admin[name] = anyRegex;
                 }
@@ -47,10 +47,10 @@ module.exports = AdminModule = {
 
         // tennu.Client! -> [Admin] throws Error
         function initalizeAdmins () {
-            const admins = client.config('admins');
+            const admins = client.config("admins");
 
             if (!Array.isArray(admins)) {
-                const errormsg = '\'admins\' property in configuration must be an array';
+                const errormsg = "\"admins\" property in configuration must be an array";
                 client.error(errormsg);
                 throw new Error(errormsg);
             }
@@ -63,7 +63,7 @@ module.exports = AdminModule = {
             return names.every(function (name) {
                 const result = admin[name].test(hostmask[name]);
 
-                client.debug('PluginAdmin', format('%s: %s, %s (%s)',
+                client.debug("PluginAdmin", format("%s: %s, %s (%s)",
                     name, hostmask[name], admin[name], result));
 
                 return admin[name].test(hostmask[name]);
@@ -81,15 +81,15 @@ module.exports = AdminModule = {
                 });
 
                 if (hostmask_passed.some(notHasIdentifiedasProperty)) {
-                    client.debug('PluginAdmin', 'Admin object w/o identifiedas property (true)');
+                    client.debug("PluginAdmin", "Admin object w/o identifiedas property (true)");
                     return true;
                 }
 
-                client.debug('PluginAdmin', 'Admin object w/o identifiedas property (false)');
+                client.debug("PluginAdmin", "Admin object w/o identifiedas property (false)");
 
                 return (function recur () {
                     if (hostmask_passed.length === 0) {
-                        client.debug('PluginAdmin', 'User passes an identifiedas check (false)');
+                        client.debug("PluginAdmin", "User passes an identifiedas check (false)");
                         return false;
                     }
 
@@ -102,7 +102,7 @@ module.exports = AdminModule = {
                     })
                     .then(function (isIdentifiedAs) {
                         if (isIdentifiedAs) {
-                            client.debug('PluginAdmin', 'User passes an identifiedas check (true)');
+                            client.debug("PluginAdmin", "User passes an identifiedas check (true)");
                             return true;
                         } else {
                             return recur();
@@ -147,7 +147,7 @@ module.exports = AdminModule = {
             }
         };
     },
-    name: 'admin',
-    role: 'admin',
-    requires: ['user']
+    name: "admin",
+    role: "admin",
+    requires: ["user"]
 };
