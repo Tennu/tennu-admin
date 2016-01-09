@@ -1,6 +1,6 @@
 {
   "name": "tennu-admin",
-  "version": "3.0.2",
+  "version": "3.1.0",
   "description": "Tennu Admin module.",
   "homepage": "https://tennu.github.io/plugins/admin",
   "main": "plugin.js",
