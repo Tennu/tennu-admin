@@ -46,8 +46,9 @@ module.exports = AdminModule = {
         }
 
         // tennu.Client! -> [Admin] throws Error
-        function initalizeAdmins () {
-            const admins = client.config("admins");
+        function initalizeAdmins (adminConfigObject) {
+            
+            const admins = adminConfigObject || client.config("admins");
 
             if (!Array.isArray(admins)) {
                 const errormsg = "\"admins\" property in configuration must be an array";
@@ -66,7 +67,7 @@ module.exports = AdminModule = {
                 client.debug("PluginAdmin", format("%s: %s, %s (%s)",
                     name, hostmask[name], admin[name], result));
 
-                return admin[name].test(hostmask[name]);
+                return result;
             });
         }
 
@@ -74,9 +75,9 @@ module.exports = AdminModule = {
         admins = initalizeAdmins();
 
         // Hostmask -> Promise boolean
-        const isAdmin = function (hostmask) {
+        const isAdmin = function (hostmask, customAdmins) {
             return Promise.try(function () {
-                const hostmask_passed = admins.filter(function (admin) {
+                const hostmask_passed = (customAdmins || admins).filter(function (admin) {
                     return checkHostmask(hostmask, admin);
                 });
 
@@ -143,7 +144,11 @@ module.exports = AdminModule = {
             },            
             exports: {
                 isAdmin: isAdmin,
-                requiresAdmin: requiresAdmin
+                requiresAdmin: requiresAdmin,
+                
+                initalizeAdmins: initalizeAdmins,
+                regexify: regexify,
+                checkHostmask: checkHostmask
             }
         };
     },
