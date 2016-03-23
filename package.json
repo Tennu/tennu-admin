@@ -35,6 +35,6 @@
     "sweet-bdd": "~1.0.0"
   },
   "dependencies": {
-    "bluebird": "~1.0.0"
+    "bluebird": "^3.0.0"
   }
 }
