@@ -5,7 +5,7 @@ const anyRegex = /.*/;
 const names = ["nickname", "username", "hostname"];
 const adminKeys = names.concat("identifiedas");
 // Hostmask :: {nickname: String, username: String, hostname: String}
-// Response :: tennu$Response
+// Privmsg :: tennu::IRCMessage::Privmsg
 // Admin :: {nickname: RegExp, username: RegExp, hostname: RegExp, identifiedas: String?}
 
 function notHasIdentifiedasProperty (admin) {
@@ -113,19 +113,32 @@ module.exports = AdminModule = {
             });
         };
 
-        // (Command -> Response) -> (Command -> Response)
+        // (Privmsg -> Response) -> (Privmsg -> Response)
         const requiresAdmin = function (fn) {
-            return function (command) {
-                return isAdmin(command.hostmask)
+            return function (privmsg) {
+                return isAdmin(privmsg.hostmask)
                 .then(function (isAdmin) {
                     if (isAdmin) {
-                        return fn(command);
+                        return fn(privmsg);
                     } else {
                         return deniedResponse;
                     }
                 });
             };
         };
+
+        // (Privmsg, () -> Response) -> Response
+        const checkAdmin = function (privmsg, adminOnlyCallback) {
+            return isAdmin(privmsg.hostmask)
+            .then(function (isAdmin) {
+                if (isAdmin) {
+                    return adminOnlyCallback();
+                } else {
+                    client.note("PluginAdmin", format("'%s' tried to execute admin-only functionality", command.nickname));
+                    return deniedResponse;
+                }
+            });
+        }
 
         return {
             commandMiddleware: function(command) {
@@ -144,6 +157,7 @@ module.exports = AdminModule = {
             },            
             exports: {
                 isAdmin: isAdmin,
+                checkAdmin: checkAdmin,
                 requiresAdmin: requiresAdmin,
                 
                 initalizeAdmins: initalizeAdmins,
