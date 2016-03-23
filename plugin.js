@@ -134,7 +134,7 @@ module.exports = AdminModule = {
                 if (isAdmin) {
                     return adminOnlyCallback();
                 } else {
-                    client.note("PluginAdmin", format("'%s' tried to execute admin-only functionality", command.nickname));
+                    client.note("PluginAdmin", format("'%s' tried to execute admin-only functionality", privmsg.nickname));
                     return deniedResponse;
                 }
             });
