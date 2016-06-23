@@ -23,12 +23,17 @@ function cloneOnlyAdminKeys (object) {
 }
 
 module.exports = AdminModule = {
+    configDefaults: {
+        "admin-failed-attempt-response": "Permission denied.",
+        "admin-commands": []
+    },
+
     init: function (client, imports) {
         const isIdentifiedAs = imports.user.isIdentifiedAs;
         var admins;
         
-        const deniedResponse = (client.config("admin-failed-attempt-response") || "Permission denied.");
-        const forcedAdminCommands = client.config("admin-commands") || [];
+        const deniedResponse = client.config("admin-failed-attempt-response");
+        const forcedAdminCommands = client.config("admin-commands");
 
         // tennu.Client! -> {nickname: String?, username: String?, hostname: String?, identifiedas: String?} -> Admin
         function regexify (admin) {
@@ -75,8 +80,10 @@ module.exports = AdminModule = {
         admins = initalizeAdmins();
 
         // Hostmask -> Promise boolean
-        const isAdmin = function (hostmask, customAdmins) {
+        const isAdmin = function (hostmask, opts) {
             return Promise.try(function () {
+                const customAdmins = opts && opts.customAdmins;
+                const memoizationKey = opts && opts.memoizeOver;
                 const hostmask_passed = (customAdmins || admins).filter(function (admin) {
                     return checkHostmask(hostmask, admin);
                 });
@@ -99,7 +106,7 @@ module.exports = AdminModule = {
                         return hostmask.identifiedas;
                     })
                     .then(function (accountname) {
-                        return isIdentifiedAs(hostmask.nickname, accountname);
+                        return isIdentifiedAs(hostmask.nickname, accountname, {memoizeOver: memoizationKey});
                     })
                     .then(function (isIdentifiedAs) {
                         if (isIdentifiedAs) {
@@ -116,7 +123,11 @@ module.exports = AdminModule = {
         // (Privmsg -> Response) -> (Privmsg -> Response)
         const requiresAdmin = function (fn) {
             return function (privmsg) {
-                return isAdmin(privmsg.hostmask)
+                // If the "command" property is set, it's a command, and not a privmsg.
+                // The prototype of a command is the privmsg though.
+                const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg.command) : privmsg.command;
+
+                return isAdmin(privmsg.hostmask, {memoizeOver: memoizeOver})
                 .then(function (isAdmin) {
                     if (isAdmin) {
                         return fn(privmsg);
@@ -129,7 +140,11 @@ module.exports = AdminModule = {
 
         // (Privmsg, () -> Response) -> Response
         const checkAdmin = function (privmsg, adminOnlyCallback) {
-            return isAdmin(privmsg.hostmask)
+            // If the "command" property is set, it's a command, and not a privmsg.
+            // The prototype of a command is the privmsg though.
+            const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg.command) : privmsg.command;
+
+            return isAdmin(privmsg.hostmask, {memoizeOver: memoizeOver})
             .then(function (isAdmin) {
                 if (isAdmin) {
                     return adminOnlyCallback();
@@ -146,7 +161,7 @@ module.exports = AdminModule = {
                     return command;
                 }
 
-                return isAdmin(command.hostmask)
+                return isAdmin(command.hostmask, {memoizeOver: Object.getPrototypeOf(command)})
                 .then(function(isAdmin) {
                     if (isAdmin) {
                         return command;
@@ -168,5 +183,5 @@ module.exports = AdminModule = {
     },
     name: "admin",
     role: "admin",
-    requires: ["user"]
+    requires: ["config", "user"]
 };
