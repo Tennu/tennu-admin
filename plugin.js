@@ -125,7 +125,7 @@ module.exports = AdminModule = {
             return function (privmsg) {
                 // If the "command" property is set, it's a command, and not a privmsg.
                 // The prototype of a command is the privmsg though.
-                const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg.command) : privmsg.command;
+                const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg) : privmsg;
 
                 return isAdmin(privmsg.hostmask, {memoizeOver: memoizeOver})
                 .then(function (isAdmin) {
@@ -142,7 +142,7 @@ module.exports = AdminModule = {
         const checkAdmin = function (privmsg, adminOnlyCallback) {
             // If the "command" property is set, it's a command, and not a privmsg.
             // The prototype of a command is the privmsg though.
-            const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg.command) : privmsg.command;
+            const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg) : privmsg;
 
             return isAdmin(privmsg.hostmask, {memoizeOver: memoizeOver})
             .then(function (isAdmin) {
