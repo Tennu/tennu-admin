@@ -7,6 +7,7 @@ const adminKeys = names.concat("identifiedas");
 // Hostmask :: {nickname: String, username: String, hostname: String}
 // Privmsg :: tennu::IRCMessage::Privmsg
 // Admin :: {nickname: RegExp, username: RegExp, hostname: RegExp, identifiedas: String?}
+const allowAllSymbol = Symbol("Admin Command - Allow all");
 
 function notHasIdentifiedasProperty (admin) {
     return !admin["identifiedas"];
@@ -82,6 +83,10 @@ module.exports = AdminModule = {
         // Hostmask -> Promise boolean
         const isAdmin = function (hostmask, opts) {
             return Promise.try(function () {
+                if (opts && opts.allowAll === true) {
+                    return true;
+                }
+
                 const customAdmins = opts && opts.customAdmins;
                 const memoizationKey = opts && opts.memoizeOver;
                 const hostmask_passed = (customAdmins || admins).filter(function (admin) {
@@ -126,8 +131,9 @@ module.exports = AdminModule = {
                 // If the "command" property is set, it's a command, and not a privmsg.
                 // The prototype of a command is the privmsg though.
                 const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg) : privmsg;
+                const allowAll = privmsg[allowAllSymbol];
 
-                return isAdmin(privmsg.hostmask, {memoizeOver: memoizeOver})
+                return isAdmin(privmsg.hostmask, {memoizeOver, allowAll})
                 .then(function (isAdmin) {
                     if (isAdmin) {
                         return fn(privmsg);
@@ -143,8 +149,9 @@ module.exports = AdminModule = {
             // If the "command" property is set, it's a command, and not a privmsg.
             // The prototype of a command is the privmsg though.
             const memoizeOver = privmsg.command ? Object.getPrototypeOf(privmsg) : privmsg;
+            const allowAll = privmsg[allowAllSymbol];
 
-            return isAdmin(privmsg.hostmask, {memoizeOver: memoizeOver})
+            return isAdmin(privmsg.hostmask, {memoizeOver, allowAll})
             .then(function (isAdmin) {
                 if (isAdmin) {
                     return adminOnlyCallback();
@@ -171,13 +178,14 @@ module.exports = AdminModule = {
                 });
             },            
             exports: {
-                isAdmin: isAdmin,
-                checkAdmin: checkAdmin,
-                requiresAdmin: requiresAdmin,
+                isAdmin,
+                checkAdmin,
+                requiresAdmin,
+                allowAll: allowAllSymbol,
                 
-                initalizeAdmins: initalizeAdmins,
-                regexify: regexify,
-                checkHostmask: checkHostmask
+                initalizeAdmins,
+                regexify,
+                checkHostmask,
             }
         };
     },
